@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mood Tracker - Daily Check-in</title>
@@ -329,7 +330,8 @@
 <body>
     <header>
     <div class="logo">
-        <span class="logo-text">AsDevAd</span>
+      <img src="https://i.ibb.co/ksr38h61/Mindful-Logo.png" alt="Mindful AI Logo" class="logo-img">
+      <span class="logo-text">Mindful AI</span>
     </div>
     
     <div class="menu-toggle" id="menu-toggle">
@@ -341,9 +343,12 @@
     <nav>
         <ul id="nav-menu">
             <li><a href="dashboard.html" class="nav-link">Home</a></li>
+            <li><a href="articles.html" class="nav-link">Articles</a></li>
+            <li><a href="resources.html" class="nav-link">Resources</a></li>
             <li><a href="about.html" class="nav-link">About</a></li>
-            <li><a href="#" class="nav-link">Services</a></li>
-            <li><a href="about.html" class="nav-link">Contact</a></li>
+            <li><a href="services.html" class="nav-link">Services</a></li>
+            <li><a href="community.html" class="nav-link">Community</a></li>
+            <li><a href="settings.html" class="nav-link">Settings</a></li>
         </ul>
     </nav>
 </header>
@@ -370,9 +375,40 @@ header {
     z-index: 1000;
 }
 
+/* Slightly compact header padding so logo fits without pushing nav */
+@media (min-width: 769px) {
+    header { padding: 1rem 1.5rem; }
+}
+
 .logo {
     display: flex;
     align-items: center;
+}
+
+/* Ensure logo is a small fixed-height icon and doesn't push layout */
+.logo-img {
+    height: 44px; /* fixed height between 40-50px */
+    max-height: 50px;
+    width: auto;
+    display: block;
+    object-fit: contain;
+    margin-right: 8px;
+}
+
+/* Force header to a single horizontal row: logo left, nav to the right */
+header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Let the nav take remaining space and keep links on one line */
+nav { flex: 1 1 auto; }
+nav ul { justify-content: flex-start; align-items: center; }
+
+/* Reduce header vertical padding so logo doesn't create big whitespace */
+@media (min-width: 769px) {
+    header { padding: 0.6rem 1.2rem; }
 }
 
 .logo-text {
@@ -502,6 +538,103 @@ nav ul {
         font-size: 1.3rem;
     }
 }
+
+@media (max-width: 640px) {
+    header {
+        padding: 0.75rem 1.5rem;
+    }
+
+    .logo-text {
+        font-size: 1.1rem;
+    }
+
+    nav ul {
+        gap: 2rem;
+    }
+
+    .nav-link {
+        font-size: 1rem;
+        padding: 0.75rem;
+    }
+
+    .menu-toggle span {
+        width: 20px;
+        height: 2px;
+    }
+
+    main {
+        padding: 1.5rem 0.75rem;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1.2rem;
+    }
+
+    .card {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    header {
+        padding: 0.5rem 1rem;
+    }
+
+    .logo-text {
+        font-size: 0.9rem;
+    }
+
+    nav ul {
+        gap: 1.5rem;
+    }
+
+    .nav-link {
+        font-size: 0.9rem;
+        padding: 0.5rem;
+    }
+
+    .menu-toggle {
+        width: 24px;
+        height: 18px;
+    }
+
+    .menu-toggle span {
+        width: 18px;
+        height: 1.5px;
+    }
+
+    main {
+        padding: 1rem 0.5rem;
+    }
+
+    h1 {
+        font-size: 1.2rem;
+    }
+
+    h2 {
+        font-size: 1rem;
+    }
+
+    .card {
+        padding: 0.8rem;
+        margin: 0.75rem 0;
+    }
+
+    button {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    input, textarea {
+        padding: 0.6rem;
+        font-size: 0.9rem;
+    }
+}
+
 </style>
 
 <script>

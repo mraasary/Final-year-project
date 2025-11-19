@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Peaceful Garden - Stress Relief Game</title>
@@ -421,6 +422,12 @@
                 padding: 15px;
             }
         }
+        /* Mini-games styles */
+        .mini-game { background: white; border-radius: 12px; padding: 18px; box-shadow: 0 6px 18px rgba(5,68,94,0.06); }
+        .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .card { background: linear-gradient(90deg,var(--baby-blue),#fff); border-radius: 10px; height: 80px; display:flex;align-items:center;justify-content:center;font-size:1.6rem; cursor:pointer; user-select:none; }
+        @media (max-width:768px){ .card-grid { grid-template-columns: repeat(2,1fr); } }
+        .bubble { position:absolute; border-radius:50%; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(255,255,255,0.2)); cursor:pointer; box-shadow: 0 6px 14px rgba(5,68,94,0.08); }
     header {
     background: var(--navy-blue);
     padding: 15px 0;
@@ -443,6 +450,20 @@
     font-size: 1.5em;
     font-weight: bold;
 }
+
+/* Small fixed logo and header layout adjustments */
+.logo-img {
+    height: 44px;
+    max-height: 50px;
+    width: auto;
+    object-fit: contain;
+    margin-right: 10px;
+}
+
+header { display: block; }
+.container.header-content { display: flex; align-items: center; gap: 12px; }
+nav { flex: 1 1 auto; }
+nav ul { justify-content: flex-start; align-items: center; }
 
 .logo-icon {
     margin-right: 10px;
@@ -475,14 +496,14 @@ nav ul li a.active {
 
     <header>
       <div class="container header-content">
-        <div class="logo">
-          <div class="logo-icon"><i class="fas fa-sun"></i></div>
-          <div class="logo-text">AsDevAd</div>
-        </div>
+                <div class="logo">
+                    <img src="https://i.ibb.co/ksr38h61/Mindful-Logo.png" alt="Mindful AI Logo" class="logo-img">
+                    <div class="logo-text">Mindful AI</div>
+                </div>
 
         <nav>
           <ul>
-            <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="dashboard.html" class="active"><i class="fas fa-cog"></i> Dashboard</a></li>
             <li><a href="articles.html"><i class="fas fa-book"></i> Resources</a></li>
             <li><a href="community.html"><i class="fas fa-comments"></i> Community</a></li>
             <li><a href="#"><i class="fas fa-chart-line"></i> Progress</a></li>
@@ -575,6 +596,24 @@ nav ul li a.active {
                 <div class="activity-title">Your Journey</div>
                 <div class="activity-desc">Track your path to peace</div>
             </div>
+            <!-- Mini-games: Bubble Pop, Reaction Test, Memory Match -->
+            <div class="activity-card" onclick="showBubblePop()">
+                <div class="activity-icon">💥</div>
+                <div class="activity-title">Bubble Pop</div>
+                <div class="activity-desc">Pop as many bubbles as you can</div>
+            </div>
+
+            <div class="activity-card" onclick="showReactionTest()">
+                <div class="activity-icon">⚡</div>
+                <div class="activity-title">Reaction Test</div>
+                <div class="activity-desc">Measure your reaction time</div>
+            </div>
+
+            <div class="activity-card" onclick="showMemoryMatch()">
+                <div class="activity-icon">🧠</div>
+                <div class="activity-title">Memory Match</div>
+                <div class="activity-desc">Find matching pairs</div>
+            </div>
         </div>
 
         <!-- Drawing Activity -->
@@ -604,6 +643,33 @@ nav ul li a.active {
                     Click to create ripples of peace 🌊
                 </div>
             </div>
+        </div>
+
+        <!-- Mini-games containers -->
+        <div id="bubblePop" class="activity-section hidden mini-game">
+            <h3>🫧 Bubble Pop</h3>
+            <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;">
+                <button class="cta-button" id="startBubbleBtn">Start (20s)</button>
+                <div>Score: <span id="bubbleScore">0</span></div>
+                <div>Time left: <span id="bubbleTime">20</span>s</div>
+            </div>
+            <div id="bubbleArea" style="position:relative;height:320px;border-radius:12px;border:2px dashed var(--baby-blue);background:linear-gradient(180deg,var(--white),var(--baby-blue));overflow:hidden"></div>
+        </div>
+
+        <div id="reactionTest" class="activity-section hidden mini-game">
+            <h3>⚡ Reaction Time Test</h3>
+            <div id="reactionBox" style="height:180px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--baby-blue);font-size:1.6rem;">Click Start to begin</div>
+            <div style="margin-top:12px;display:flex;gap:12px;align-items:center;">
+                <button class="cta-button" id="startReactionBtn">Start</button>
+                <div>Last: <span id="reactionLast">-</span> ms</div>
+            </div>
+        </div>
+
+        <div id="memoryMatch" class="activity-section hidden mini-game">
+            <h3>🧩 Memory Match</h3>
+            <div style="margin-bottom:12px;">Tries: <span id="memoryTries">0</span> — Matches: <span id="memoryMatches">0</span></div>
+            <div id="cardGrid" class="card-grid"></div>
+            <div style="margin-top:12px;"><button class="cta-button" id="resetMemoryBtn">Reset</button></div>
         </div>
 
         <!-- Stats -->
@@ -820,5 +886,135 @@ nav ul li a.active {
             updateStats();
         };
     </script>
+        <!-- Mini-games script -->
+        <script>
+        // Helpers to hide all activities and show one
+        function hideAllActivities() {
+                document.getElementById('drawingActivity')?.classList.add('hidden');
+                document.getElementById('zenActivity')?.classList.add('hidden');
+                document.getElementById('drawingActivity')?.classList.add('hidden');
+                document.getElementById('bubblePop')?.classList.add('hidden');
+                document.getElementById('reactionTest')?.classList.add('hidden');
+                document.getElementById('memoryMatch')?.classList.add('hidden');
+                // keep stats visible area as it is
+        }
+
+        // Show Bubble Pop
+        function showBubblePop(){ hideAllActivities(); document.getElementById('bubblePop').classList.remove('hidden'); }
+        // Show Reaction Test
+        function showReactionTest(){ hideAllActivities(); document.getElementById('reactionTest').classList.remove('hidden'); }
+        // Show Memory Match
+        function showMemoryMatch(){ hideAllActivities(); document.getElementById('memoryMatch').classList.remove('hidden'); }
+
+        // Bubble Pop game
+        (function(){
+            const area = document.getElementById('bubbleArea');
+            const startBtn = document.getElementById('startBubbleBtn');
+            const scoreEl = document.getElementById('bubbleScore');
+            const timeEl = document.getElementById('bubbleTime');
+            let timer = null, timeLeft = 20, score = 0, spawnInterval;
+
+            function spawnBubble(){
+                if(!area) return;
+                const b = document.createElement('div');
+                const size = 30 + Math.random()*60;
+                b.className = 'bubble';
+                b.style.width = size + 'px';
+                b.style.height = size + 'px';
+                b.style.left = Math.random()*(area.clientWidth - size) + 'px';
+                b.style.top = Math.random()*(area.clientHeight - size) + 'px';
+                b.style.opacity = 0.9;
+                area.appendChild(b);
+                b.addEventListener('click', function(){ score++; scoreEl.textContent = score; b.remove(); });
+                // slowly fade and remove
+                setTimeout(()=>{ b.remove(); }, 5000);
+            }
+
+            function startRound(){
+                if(!area) return;
+                score = 0; timeLeft = 20; scoreEl.textContent = score; timeEl.textContent = timeLeft;
+                spawnInterval = setInterval(spawnBubble, 600);
+                timer = setInterval(()=>{
+                    timeLeft--; timeEl.textContent = timeLeft;
+                    if(timeLeft<=0){ clearInterval(timer); clearInterval(spawnInterval); timer=null; spawnInterval=null; }
+                },1000);
+            }
+
+            startBtn?.addEventListener('click', startRound);
+        })();
+
+        // Reaction Time game
+        (function(){
+            const box = document.getElementById('reactionBox');
+            const start = document.getElementById('startReactionBtn');
+            const last = document.getElementById('reactionLast');
+            let waiting = false; let startTime=0;
+
+            start?.addEventListener('click', ()=>{
+                if(!box) return;
+                box.textContent = 'Get ready...'; box.style.background = 'var(--baby-blue)';
+                waiting = true; last.textContent = '-';
+                const delay = 1000 + Math.random()*3000;
+                setTimeout(()=>{
+                    if(!waiting) return;
+                    box.textContent = 'CLICK!'; box.style.background = 'linear-gradient(90deg,var(--blue-grotto),var(--blue-green))';
+                    startTime = performance.now();
+                    // one-time click
+                    function onClick(){
+                        const rt = Math.round(performance.now() - startTime);
+                        last.textContent = rt;
+                        waiting = false; box.textContent = 'Click Start to begin'; box.style.background = 'var(--baby-blue)';
+                        box.removeEventListener('click', onClick);
+                    }
+                    box.addEventListener('click', onClick);
+                }, delay);
+            });
+        })();
+
+        // Memory Match
+        (function(){
+            const grid = document.getElementById('cardGrid');
+            const triesEl = document.getElementById('memoryTries');
+            const matchesEl = document.getElementById('memoryMatches');
+            const resetBtn = document.getElementById('resetMemoryBtn');
+            let first=null, second=null, lock=false, tries=0, matches=0;
+
+            function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+
+            function build(){
+                if(!grid) return;
+                grid.innerHTML=''; tries=0; matches=0; triesEl.textContent=tries; matchesEl.textContent=matches;
+                const vals = ['🍃','🌊','🌟'];
+                const cards = shuffle(vals.concat(vals));
+                cards.forEach((v,i)=>{
+                    const d = document.createElement('div'); d.className='card'; d.dataset.value = v; d.textContent = '';
+                    d.addEventListener('click', ()=>{ if(lock || d.classList.contains('matched') || d===first) return; reveal(d); });
+                    grid.appendChild(d);
+                });
+            }
+
+            function reveal(card){
+                card.textContent = card.dataset.value; card.style.transform = 'scale(1.03)';
+                if(!first) { first = card; return; }
+                second = card; lock=true; tries++; triesEl.textContent = tries;
+                if(first.dataset.value === second.dataset.value){
+                    first.classList.add('matched'); second.classList.add('matched'); matches++; matchesEl.textContent = matches; resetTurn();
+                } else {
+                    setTimeout(()=>{ first.textContent=''; second.textContent=''; resetTurn(); }, 800);
+                }
+            }
+
+            function resetTurn(){ first=null; second=null; lock=false; }
+
+            resetBtn?.addEventListener('click', build);
+            // build on load so it's ready
+            build();
+        })();
+
+        // Expose show functions to onclick handlers
+        window.showBubblePop = showBubblePop;
+        window.showReactionTest = showReactionTest;
+        window.showMemoryMatch = showMemoryMatch;
+        </script>
 </body>
 </html>

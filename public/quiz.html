@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mental Health Assessment | AsDevAd</title>
+  <title>Mental Health Assessment | Mindful AI</title>
     <meta name="description" content="Mental health assessment quiz" />
-     <meta name="author" content="AsDevAd" />
+  <meta name="author" content="Mindful AI" />
     <link rel="stylesheet" href="landingpage.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
   </head>
@@ -20,14 +21,19 @@
       
       <header>
         <div class="logo">
-          <span class="logo-text">AsDevAd</span>
+          <img src="https://i.ibb.co/ksr38h61/Mindful-Logo.png" alt="Mindful AI Logo" class="logo-img">
+          <span class="logo-text">Mindful AI</span>
         </div>
         <nav>
           <ul>
-            <li><a href="landingpage.html" class="nav-link">Home</a></li>
+            <li><a href="landingpage.html" class="nav-link" aria-label="Home"><i class="fas fa-house"></i> Home</a></li>
+            <li><a href="articles.html" class="nav-link">Articles</a></li>
+            <li><a href="resources.html" class="nav-link">Resources</a></li>
             <li><a href="about.html" class="nav-link">About</a></li>
-            <li><a href="about.html" class="nav-link">Services</a></li>
-            <li><a href="about.html" class="nav-link">Contact</a></li>
+            <li><a href="services.html" class="nav-link">Services</a></li>
+            <li><a href="community.html" class="nav-link">Community</a></li>
+            <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+            <li><a href="settings.html" class="nav-link">Settings</a></li>
           </ul>
         </nav>
       </header>
@@ -612,23 +618,25 @@
     </div>
   </div>
 </div>
-
-           <button type="submit" class="btn primary-btn submit-quiz">Submit Assessment</button>
-
+            </div>
+            <div style="margin-top:18px;text-align:center;">
+              <button type="submit" class="btn primary-btn submit-quiz">Submit Assessment</button>
+            </div>
           </form>
         </div>
       </main>
 
       <footer>
         <div class="footer-content">
-          <p>&copy; 2025 AsDevAd. All rights reserved.</p>
           <div class="footer-links">
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Service</a>
-            <a href="#">Contact Us</a>
+            <a href="privacy.html">Privacy</a>
+            <a href="terms.html">Terms</a>
+            <a href="contact.html">Contact</a>
           </div>
+          <p>&copy; <span id="year"></span> Mindful AI. All rights reserved.</p>
         </div>
       </footer>
+      <script>document.getElementById('year') && (document.getElementById('year').textContent=new Date().getFullYear());</script>
     </div>
 
    <script>

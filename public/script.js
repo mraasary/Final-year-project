@@ -21,6 +21,40 @@ document.addEventListener('DOMContentLoaded', () => {
   // Chat state
   let chatHistory = [];
   let initialMoodRating = null;
+
+  // Questionnaire modal handling: prevent full page submit and start session
+  const questionnaireForm = document.getElementById('questionnaire-form');
+  const questionnaireModal = document.getElementById('questionnaire-modal');
+  if (questionnaireForm) {
+    questionnaireForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const moodVal = document.getElementById('mood-rating')?.value;
+      const mainConcernsVal = document.getElementById('main-concerns')?.value;
+      const recentEventsVal = document.getElementById('recent-events')?.value;
+      const sessionGoalsVal = document.getElementById('session-goals')?.value;
+
+      // Set CBT fields
+      if (moodVal) {
+        initialMoodRating = moodVal;
+        if (initialMoodField) initialMoodField.value = moodVal;
+      }
+      if (mainConcernsVal && situationField) situationField.value = mainConcernsVal;
+      // optionally populate other fields if available
+      if (recentEventsVal && automaticThoughtField) automaticThoughtField.value = recentEventsVal;
+      if (sessionGoalsVal && cognitiveDistortionField) cognitiveDistortionField.value = sessionGoalsVal;
+
+      // Close modal smoothly
+      if (questionnaireModal) {
+        questionnaireModal.classList.add('hiding');
+        setTimeout(() => {
+          questionnaireModal.style.display = 'none';
+        }, 300);
+      }
+
+      // Start conversation with a friendly prompt
+      addBotMessage('Thanks — I\'ve noted your responses. Let\'s begin. What would you like to focus on today?');
+    });
+  }
   
   // Check if user is logged in
   const currentUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -100,7 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Add bot response to chat
       addBotMessage(data.reply);
-      
       // Add to chat history
       chatHistory.push({ role: 'assistant', content: data.reply });
       
@@ -205,6 +238,8 @@ document.addEventListener('DOMContentLoaded', () => {
     return text.replace(urlRegex, url => `<a href="${url}" target="_blank">${url}</a>`)
               .replace(/\n/g, '<br>');
   }
+  
+  // (response style helpers removed)
   
   function showTypingIndicator() {
     const typingElement = document.createElement('div');

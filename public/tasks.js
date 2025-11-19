@@ -1,185 +1,231 @@
-const DEFAULT_TASKS = [
-  { task: 'Drink a glass of water', time: '08:00' },
-  { task: '5-minute mindful breathing', time: '09:00' },
-  { task: 'Take a short walk (10 mins)', time: '11:00' },
-  { task: 'Eat a nourishing meal', time: '13:00' },
-  { task: "Write 3 things you're grateful for", time: '18:00' },
-  { task: 'Stretch or light yoga (5 mins)', time: '19:30' },
-  { task: 'Sleep by 10:30 PM', time: '22:30' },
-];
+/*
+  Client-side Todo Manager
+  - Fully client-side with localStorage persistence under key 'todoTasks'
+  - Features: add, edit, delete, toggle complete, filters, clear all
+  - Gracefully attempts server sync if /api/tasks endpoints are available (best-effort)
+*/
 
-async function loadTodayTasks() {
-  const user = JSON.parse(localStorage.getItem("currentUser"));
-  const email = user?.email;
-  if (!email) return;
+const TODO_KEY = 'todoTasks_v1';
 
-  const today = new Date();
-  const todayStr = today.toISOString().split("T")[0];
-  const taskList = document.getElementById("task-list");
-  if (!taskList) return; // Not on dashboard page
-  
-  taskList.innerHTML = "";
+function generateId() {
+  return 't_' + Math.random().toString(36).slice(2, 9);
+}
 
+function readTasks() {
   try {
-    const res = await fetch(`http://localhost:3000/api/tasks/${email}`);
-    const data = await res.json();
-    const todayTasks = [];
-
-    // All tasks from DB for today
-    const allTasks = data.groupedTasks?.[todayStr] || [];
-
-    // Add DB tasks first (completed + custom ones)
-    allTasks.forEach(task => {
-      todayTasks.push({ ...task, source: "db" });
-    });
-
-    // Add default tasks only if not already in DB
-    DEFAULT_TASKS.forEach(defaultTask => {
-      const exists = allTasks.some(
-        t => t.task === defaultTask.task && t.time === defaultTask.time
-      );
-      if (!exists) todayTasks.push({ ...defaultTask, completed: false, source: "default" });
-    });
-
-    // Render tasks
-    for (const task of todayTasks) {
-      const item = document.createElement("li");
-      item.className = "task-item" + (task.completed ? " task-completed" : "");
-
-      item.innerHTML = `
-        <div class="task-checkbox ${task.completed ? "completed" : ""}"></div>
-        <div class="task-text">${task.task}</div>
-        <div class="task-due">${task.time}</div>
-      `;
-
-      // Toggle complete/incomplete
-      item.querySelector(".task-checkbox").addEventListener("click", async () => {
-        const checkbox = item.querySelector(".task-checkbox");
-        checkbox.classList.toggle("completed");
-        item.classList.toggle("task-completed");
-
-        const isCompleted = checkbox.classList.contains("completed");
-
-        await fetch("http://localhost:3000/api/tasks", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email,
-            task: task.task,
-            time: task.time,
-            date: todayStr,
-            completed: isCompleted,
-          }),
-        });
-      });
-
-      taskList.appendChild(item);
-    }
-  } catch (err) {
-    console.error("Failed to load tasks:", err);
-    taskList.innerHTML = "<li class='task-item'>Could not load tasks</li>";
+    const raw = localStorage.getItem(TODO_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    console.error('Failed to read tasks', e);
+    return [];
   }
 }
 
-async function addCustomTask() {
-  const taskInput = document.getElementById("custom-task-name");
-  const timeInput = document.getElementById("custom-task-time");
-  const task = taskInput.value.trim();
-  const time = timeInput.value || "Anytime";
-
-  if (!task) return alert("Please enter a task name.");
-
-  const user = JSON.parse(localStorage.getItem("currentUser"));
-  const email = user?.email;
-  if (!email) return alert("User not logged in");
-
-  const today = new Date().toISOString().split("T")[0];
-
-  try {
-    const res = await fetch("http://localhost:3000/api/tasks", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email,
-        task,
-        time,
-        date: today,
-        completed: false,
-      }),
-    });
-
-    const result = await res.json();
-    if (res.ok) {
-      alert("New task added!");
-      taskInput.value = "";
-      timeInput.value = "";
-      loadTodayTasks(); // Refresh task list
-    } else {
-      alert("Failed to add task: " + result.error);
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Error adding task.");
-  }
+function writeTasks(tasks) {
+  localStorage.setItem(TODO_KEY, JSON.stringify(tasks));
 }
 
-async function loadTaskHistory() {
-  const user = JSON.parse(localStorage.getItem("currentUser"));
-  const email = user?.email;
+function formatTime(t) {
+  return t ? t : 'Anytime';
+}
 
-  if (!email) {
-    const container = document.getElementById('task-history-container');
-    if (container) {
-      container.innerHTML = "<p>User not found.</p>";
-    }
+function renderTasks(filter = 'all') {
+  const list = document.getElementById('todo-list');
+  if (!list) return;
+  const tasks = readTasks();
+
+  const filtered = tasks.filter(task => {
+    if (filter === 'all') return true;
+    if (filter === 'active') return !task.completed;
+    if (filter === 'completed') return task.completed;
+  });
+
+  list.innerHTML = '';
+  if (filtered.length === 0) {
+    list.innerHTML = '<li class="todo-empty">No tasks yet. Add one above ✨</li>';
     return;
   }
 
-  try {
-    const res = await fetch(`http://localhost:3000/api/tasks/${email}`);
-    const data = await res.json();
-    console.log("Fetched data from server:", data);
+  for (const t of filtered) {
+    const li = document.createElement('li');
+    li.className = 'todo-item' + (t.completed ? ' completed' : '');
+    li.dataset.id = t.id;
 
-    const groupedTasks = data.groupedTasks || {};
-    const container = document.getElementById("task-history-container");
-    if (!container) return; // Not on task history page
+    li.innerHTML = `
+      <div class="check" title="Toggle complete">${t.completed ? '✓' : ''}</div>
+      <div class="content">
+        <div class="title">${escapeHtml(t.text)}</div>
+        <div class="meta">${formatTime(t.time)}</div>
+      </div>
+      <div class="todo-actions">
+        <button class="icon-btn edit" title="Edit"><i class="fas fa-edit"></i></button>
+        <button class="icon-btn delete" title="Delete"><i class="fas fa-trash-alt"></i></button>
+      </div>
+    `;
 
-    if (Object.keys(groupedTasks).length === 0) {
-      container.innerHTML = "<p>No tasks completed yet.</p>";
-      return;
-    }
+    // toggle complete
+    li.querySelector('.check').addEventListener('click', () => {
+      toggleComplete(t.id);
+    });
 
-    container.innerHTML = "";
-    for (const [date, tasks] of Object.entries(groupedTasks)) {
-      const section = document.createElement("div");
-      section.classList.add("task-day");
-      section.innerHTML = `
-        <h2>${date}</h2>
-        <ul>
-          ${tasks.map(t => `<li>${t.task} (${t.time})</li>`).join("")}
-        </ul>
-      `;
-      container.appendChild(section);
-    }
+    // delete
+    li.querySelector('.delete').addEventListener('click', () => {
+      if (confirm('Delete this task?')) deleteTask(t.id);
+    });
 
-  } catch (error) {
-    console.error("Error loading task history:", error);
-    const container = document.getElementById("task-history-container");
-    if (container) {
-      container.innerHTML = "<p>Failed to load tasks.</p>";
-    }
+    // edit
+    li.querySelector('.edit').addEventListener('click', () => {
+      startEditTask(t.id);
+    });
+
+    list.appendChild(li);
   }
 }
 
-// Initialize based on current page
-document.addEventListener("DOMContentLoaded", function() {
-  // Check if we're on the dashboard page
-  if (document.getElementById("task-list")) {
-    loadTodayTasks();
-  }
-  
-  // Check if we're on the task history page
-  if (document.getElementById("task-history-container")) {
-    loadTaskHistory();
+function addTask(text, time) {
+  if (!text || !text.trim()) return;
+  const tasks = readTasks();
+  const newTask = { id: generateId(), text: text.trim(), time: time || '', completed: false, createdAt: Date.now() };
+  tasks.unshift(newTask);
+  writeTasks(tasks);
+  renderTasks(getActiveFilter());
+}
+
+function toggleComplete(id) {
+  const tasks = readTasks();
+  const idx = tasks.findIndex(t => t.id === id);
+  if (idx === -1) return;
+  tasks[idx].completed = !tasks[idx].completed;
+  writeTasks(tasks);
+  renderTasks(getActiveFilter());
+  // Award XP when a task is completed
+  try {
+    if (tasks[idx].completed) {
+      // default XP per task completion
+      const xpAward = 10;
+      if (window.DashboardEnhanced && typeof window.DashboardEnhanced.addXP === 'function') {
+        window.DashboardEnhanced.addXP(xpAward, 'Completed Task');
+      } else {
+        // fallback: persist locally
+        try {
+          const raw = localStorage.getItem('userXP');
+          const cur = raw ? (JSON.parse(raw).total || 0) : 0;
+          localStorage.setItem('userXP', JSON.stringify({ total: cur + xpAward }));
+        } catch (e) {}
+      }
+    }
+  } catch (e) { console.error('Error awarding XP', e); }
+}
+
+function deleteTask(id) {
+  let tasks = readTasks();
+  tasks = tasks.filter(t => t.id !== id);
+  writeTasks(tasks);
+  renderTasks(getActiveFilter());
+}
+
+function startEditTask(id) {
+  const tasks = readTasks();
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+
+  // Populate inputs for editing
+  const nameInput = document.getElementById('custom-task-name');
+  const timeInput = document.getElementById('custom-task-time');
+  const addBtn = document.getElementById('add-task-btn');
+
+  nameInput.value = t.text;
+  timeInput.value = t.time || '';
+  nameInput.focus();
+
+  // Switch add button to save
+  addBtn.textContent = 'Save';
+  addBtn.dataset.editing = id;
+}
+
+function saveEdit(id, newText, newTime) {
+  const tasks = readTasks();
+  const idx = tasks.findIndex(t => t.id === id);
+  if (idx === -1) return;
+  tasks[idx].text = newText.trim();
+  tasks[idx].time = newTime || '';
+  writeTasks(tasks);
+  renderTasks(getActiveFilter());
+}
+
+function clearAllTasks() {
+  if (!confirm('Clear all saved tasks?')) return;
+  localStorage.removeItem(TODO_KEY);
+  renderTasks(getActiveFilter());
+}
+
+function escapeHtml(text) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function getActiveFilter() {
+  const el = document.querySelector('.todo-filter.active');
+  return el ? el.id.replace('filter-', '') : 'all';
+}
+
+function bindUi() {
+  const addBtn = document.getElementById('add-task-btn');
+  const nameInput = document.getElementById('custom-task-name');
+  const timeInput = document.getElementById('custom-task-time');
+  const clearBtn = document.getElementById('clear-tasks');
+
+  addBtn.addEventListener('click', () => {
+    const editingId = addBtn.dataset.editing;
+    const text = nameInput.value.trim();
+    const time = timeInput.value;
+    if (!text) return alert('Please enter a task name');
+
+    if (editingId) {
+      saveEdit(editingId, text, time);
+      addBtn.textContent = 'Add';
+      delete addBtn.dataset.editing;
+    } else {
+      addTask(text, time);
+    }
+
+    nameInput.value = '';
+    timeInput.value = '';
+    nameInput.focus();
+  });
+
+  nameInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') addBtn.click();
+  });
+
+  clearBtn.addEventListener('click', () => clearAllTasks());
+
+  // filters
+  document.getElementById('filter-all').addEventListener('click', () => setFilter('all'));
+  document.getElementById('filter-active').addEventListener('click', () => setFilter('active'));
+  document.getElementById('filter-completed').addEventListener('click', () => setFilter('completed'));
+}
+
+function setFilter(name) {
+  document.querySelectorAll('.todo-filter').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById('filter-' + name);
+  if (el) el.classList.add('active');
+  renderTasks(name);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // initialize UI bindings and render
+  bindUi();
+  renderTasks('all');
+
+  // set today's date in dashboard (if missing)
+  const todayEl = document.getElementById('todayDate');
+  if (todayEl) {
+    const opts = { year: 'numeric', month: 'long', day: 'numeric' };
+    todayEl.textContent = new Date().toLocaleDateString(undefined, opts);
   }
 });

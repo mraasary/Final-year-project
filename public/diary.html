@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <meta charset="UTF-8">
   <title>Diary Entry</title>
   <link rel="stylesheet" href="landingpage.css">
@@ -74,6 +75,16 @@
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+
+        /* Small fixed logo to keep header balanced */
+        .logo-img {
+            height: 44px; /* fixed height around 40-50px */
+            max-height: 50px;
+            width: auto;
+            display: block;
+            object-fit: contain;
+            margin-right: 8px;
         }
 
         .logo-icon {
@@ -1236,181 +1247,190 @@
 <body>
   <div class="wave-bg"></div>
 
-  <header>
-    <div class="logo">
-        <span class="logo-text">AsDevAd</span>
-    </div>
-    
-    <div class="menu-toggle" id="menu-toggle">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
-    
-    <nav>
-        <ul id="nav-menu">
-            <li><a href="dashboard.html" class="nav-link">Home</a></li>
-            <li><a href="about.html" class="nav-link">About</a></li>
-            <li><a href="#" class="nav-link">Services</a></li>
-            <li><a href="about.html" class="nav-link">Contact</a></li>
-        </ul>
-    </nav>
-</header>
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <img src="https://i.ibb.co/ksr38h61/Mindful-Logo.png" alt="Mindful AI Logo" class="logo-img">
+                <span class="logo-text">Mindful AI</span>
+            </div>
+
+            <!-- Mobile menu toggle -->
+            <div id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <nav>
+                <ul id="nav-menu" class="nav-list">
+                    <li><a href="dashboard.html" class="nav-pill nav-link">Home</a></li>
+                    <li><a href="articles.html" class="nav-pill nav-link">Articles</a></li>
+                    <li><a href="resources.html" class="nav-pill nav-link">Resources</a></li>
+                    <li><a href="about.html" class="nav-pill nav-link">About</a></li>
+                    <li><a href="services.html" class="nav-pill nav-link">Services</a></li>
+                    <li><a href="community.html" class="nav-pill nav-link">Community</a></li>
+                    <li><a href="settings.html" class="nav-pill nav-link">Settings</a></li>
+                </ul>
+            </nav>
+
+            <div class="user-profile">
+                <div class="user-avatar">U</div>
+            </div>
+        </div>
+    </header>
 
 <style>
-/* Navbar Styles */
-:root {
-    --navy-blue: #05445e;
-    --blue-grotto: #189ab4;
-    --blue-green: #75e6da;
-    --baby-blue: #d4f1f4;
-    --white: #ffffff;
+/* Slim, clean navbar for diary.html
+   - Slim header, reduced padding and tighter gaps
+   - Keeps logo + menu-toggle on one horizontal line
+   - Nav links vertically centered and compact
+   - Mobile: hamburger opens full-screen panel below header
+*/
+
+:root{
+  --navy:#05445e;
+  --blue:#189ab4;
+  --mint:#75e6da;
+  --white:#ffffff;
 }
 
+/* Header container: make it compact */
 header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 2rem;
-    background-color: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    position: relative;
-    z-index: 1000;
+  background: var(--white);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 6px 18px rgba(5,68,94,0.06);
+  position: relative;
+  z-index: 1000;
 }
 
+/* Keep header content tight and vertically centered */
+.container.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.45rem 0.85rem; /* smaller vertical padding */
+  min-height: 48px;
+}
+
+/* Logo: slightly smaller so header stays slim */
 .logo {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+.logo-img { height: 36px; width: auto; display: block; }
+.logo-text { font-weight: 700; color: var(--navy); font-size: 1rem; margin-left: 6px; }
+
+/* Nav area occupies remaining space; center links vertically */
+nav { flex: 1 1 auto; display: flex; align-items: center; }
+
+/* Desktop nav: small gaps and compact pills */
+.nav-list {
+  display: flex;
+  gap: 8px;               /* tighter spacing between links */
+  justify-content: flex-end;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.nav-list li { margin: 0; }
+
+.nav-pill {
+  display: inline-block;
+  padding: 6px 10px;      /* reduced padding */
+  border-radius: 8px;
+  background: transparent;
+  color: var(--navy);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: color .16s ease, background .16s ease, transform .12s ease;
+}
+.nav-pill:hover {
+  color: var(--blue);
+  background: rgba(24,154,180,0.04); /* subtle hover */
+  transform: translateY(-2px);
 }
 
-.logo-text {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--navy-blue);
-    position: relative;
-    animation: float 6s ease-in-out infinite;
-}
-
-.logo-text .accent {
-    color: var(--blue-grotto);
-}
-
-@keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-    100% { transform: translateY(0px); }
-}
-
-nav {
-    position: relative;
-}
-
-nav ul {
-    display: flex;
-    list-style: none;
-    gap: 2rem;
-    transition: all 0.3s ease;
-}
-
-.nav-link {
-    color: var(--navy-blue);
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    position: relative;
-    padding: 0.5rem 0;
-}
-
-.nav-link::after {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: linear-gradient(135deg, var(--navy-blue), var(--blue-grotto));
-    transition: width 0.3s ease;
-}
-
-.nav-link:hover {
-    color: var(--blue-grotto);
-    transform: translateY(-2px);
-}
-
-.nav-link:hover::after {
-    width: 100%;
-}
-
-/* Mobile Menu Toggle */
+/* Menu toggle (hamburger) — small square, aligns with logo vertically */
 .menu-toggle {
-    display: none;
-    flex-direction: column;
-    cursor: pointer;
-    padding: 0.5rem;
-    z-index: 1001;
+  display: none; /* shown on mobile */
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
 }
-
 .menu-toggle span {
-    width: 25px;
-    height: 3px;
-    background-color: var(--navy-blue);
-    margin: 3px 0;
-    transition: all 0.3s ease;
-    border-radius: 2px;
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: var(--navy);
+  margin: 3px 0;
+  border-radius: 2px;
+  transition: transform .22s ease, opacity .18s ease;
 }
+.menu-toggle.active span:nth-child(1){ transform: rotate(45deg) translate(3px, 3px); }
+.menu-toggle.active span:nth-child(2){ opacity: 0; }
+.menu-toggle.active span:nth-child(3){ transform: rotate(-45deg) translate(3px, -3px); }
 
-.menu-toggle.active span:nth-child(1) {
-    transform: rotate(45deg) translate(5px, 5px);
-}
+/* Accessibility: clear focus state */
+.nav-pill:focus { outline: 3px solid rgba(24,154,180,0.14); outline-offset: 3px; }
 
-.menu-toggle.active span:nth-child(2) {
-    opacity: 0;
-}
+/* Avatar small polish to fit compact header */
+.user-avatar { width: 36px; height: 36px; border-radius: 50%; display: inline-flex; align-items:center; justify-content:center; background:var(--mint); color:var(--navy); font-weight:700; font-size:0.95rem; }
 
-.menu-toggle.active span:nth-child(3) {
-    transform: rotate(-45deg) translate(7px, -6px);
-}
-
-/* Mobile Styles */
+/* MOBILE: collapse nav into full-screen panel sliding from right,
+   but keep header visible (panel positioned under header). */
 @media (max-width: 768px) {
-    header {
-        padding: 1rem 2rem;
-    }
+  .logo-text { display: none; }    /* save horizontal space */
+  .menu-toggle { display: flex; }  /* show hamburger */
 
-    .menu-toggle {
-        display: flex;
-    }
+  /* Panel sits under the header (so header stays fixed top) */
+  .nav-list {
+    position: fixed;
+    top: 48px;                     /* sit immediately below header */
+    right: -100%;
+    width: 100%;
+    height: calc(100vh - 48px);
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(242,251,251,0.98));
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1.25rem;
+    transition: right .28s ease;
+    backdrop-filter: blur(8px);
+    z-index: 999;
+    padding: 1.5rem 0;
+  }
 
-    nav ul {
-        position: fixed;
-        top: 0;
-        right: -100%;
-        width: 100%;
-        height: 100vh;
-        background-color: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 3rem;
-        transition: right 0.3s ease;
-        z-index: 999;
-    }
+  /* When active the panel is fully visible */
+  .nav-list.active { right: 0; }
 
-    nav ul.active {
-        right: 0;
-    }
+  /* Larger tappable pills on mobile */
+  .nav-pill {
+    display: block;
+    width: 84%;
+    text-align: center;
+    padding: 12px 18px;
+    border-radius: 12px;
+    background: var(--white);
+    box-shadow: 0 8px 20px rgba(5,68,94,0.04);
+    font-size: 1.05rem;
+  }
 
-    .nav-link {
-        font-size: 1.2rem;
-        padding: 1rem;
-    }
-
-    .logo-text {
-        font-size: 1.3rem;
-    }
+  /* Slightly reduce header padding on very small screens */
+  .container.header-content { padding: 0.4rem 0.6rem; min-height: 46px; }
 }
+
+/* Keep other page sections (sidebar, diary card, main-content) untouched */
 </style>
 
 <!-- Mobile menu functionality moved to diary.js -->

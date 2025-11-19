@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AsDevAd | Mild Depression Dashboard</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"/>
+  <title>Mindful AI | Mild Depression Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
         :root {
             --navy-blue: #05445e;
@@ -74,7 +75,13 @@
         .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+        }
+
+        .logo-img {
+          height: 44px;
+          width: auto;
+          object-fit: contain;
         }
 
         .logo-icon {
@@ -411,6 +418,20 @@
             border-bottom: none;
         }
 
+        .task-delete-btn {
+            margin-left: auto;
+            opacity: 0;
+            transition: opacity 0.2s ease, color 0.2s ease;
+        }
+
+        .task-item:hover .task-delete-btn {
+            opacity: 1;
+        }
+
+        .task-delete-btn:hover {
+            color: #d9534f !important;
+        }
+
         .task-checkbox {
             width: 20px;
             height: 20px;
@@ -517,6 +538,237 @@
             box-shadow: 0 5px 15px rgba(24, 154, 180, 0.4);
         }
 
+        /* Task input styles moved from inline into CSS */
+        .task-input {
+          width: 100%;
+          padding: 10px;
+          margin-top: 15px;
+          border-radius: 5px;
+          border: 1px solid #ccc;
+        }
+
+        .task-time {
+          width: 100%;
+          padding: 10px;
+          margin-top: 10px;
+          border-radius: 5px;
+          border: 1px solid #ccc;
+        }
+
+        .task-add-btn {
+            margin-top: 10px;
+        }
+
+        /* Enhanced Todo Component Styles */
+        .todo-card { padding: 18px; }
+        .todo-controls { display:flex; gap:10px; align-items:center; margin-top:12px; }
+        .todo-input { flex:1; padding:12px 14px; border-radius:10px; border:1px solid #e0e0e0; }
+        .todo-time { width:120px; padding:10px 12px; border-radius:10px; border:1px solid #e0e0e0; }
+        .todo-add { background: linear-gradient(90deg, var(--blue-grotto), var(--blue-green)); color:white; border:none; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:700; }
+        .todo-add:active { transform: translateY(1px); }
+        .todo-toolbar { display:flex; gap:8px; margin-top:12px; align-items:center; }
+        .todo-filter { background:#f1f7f8; padding:6px 10px; border-radius:8px; cursor:pointer; border:1px solid transparent; }
+        .todo-filter.active { background: linear-gradient(90deg, var(--blue-grotto), var(--blue-green)); color:white; }
+        .todo-list { list-style:none; margin-top:14px; padding:0; max-height:320px; overflow:auto; }
+        .todo-item { display:flex; gap:12px; align-items:center; padding:10px; border-radius:10px; border:1px solid #f0f6f7; margin-bottom:8px; background:white; }
+        .todo-item .check { width:28px; height:28px; border-radius:8px; border:2px solid var(--blue-grotto); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+        .todo-item.completed { opacity:0.65; text-decoration:line-through; }
+        .todo-item .meta { font-size:0.85rem; color:#777; }
+        .todo-actions { margin-left:auto; display:flex; gap:8px; align-items:center; }
+        .icon-btn { background:transparent; border:none; color:var(--navy-blue); cursor:pointer; padding:6px; border-radius:8px; }
+        .icon-btn:hover { background:#f1f7f8; }
+        .todo-empty { text-align:center; color:#777; padding:22px 10px; }
+
+        /* Onboarding Styles */
+        .onboarding-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+            backdrop-filter: blur(2px);
+        }
+
+        .onboarding-tooltip {
+            position: fixed;
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            z-index: 999;
+            max-width: 380px;
+            min-width: 300px;
+            border: 3px solid var(--blue-grotto);
+            animation: tooltipSlideIn 0.3s ease-out;
+        }
+
+        @keyframes tooltipSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .tooltip-header {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--navy-blue);
+            margin-bottom: 0.75rem;
+        }
+
+        .tooltip-body {
+            font-size: 0.95rem;
+            color: #555;
+            margin-bottom: 1.2rem;
+            line-height: 1.6;
+        }
+
+        .tooltip-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .tooltip-btn {
+            background: var(--blue-grotto);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .tooltip-btn:hover {
+            background: var(--navy-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(24, 154, 180, 0.3);
+        }
+
+        .tooltip-btn:active {
+            transform: translateY(0);
+        }
+
+        .tooltip-progress {
+            font-size: 0.85rem;
+            color: #999;
+            font-weight: 600;
+            padding: 0 0.5rem;
+        }
+
+        .onboarding-highlight {
+            box-shadow: 0 0 0 4px rgba(24, 154, 180, 0.6) !important;
+            border-radius: 8px;
+            transition: box-shadow 0.3s ease, outline 0.3s ease;
+            outline: 3px solid rgba(24, 154, 180, 0.4);
+        }
+
+        /* Gamification Styles */
+        .user-stats {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-left: auto;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--baby-blue);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .badge {
+            font-size: 1.3rem;
+            margin: 0 0.25rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .badge:hover {
+            transform: scale(1.2);
+        }
+
+        #user-badges {
+            display: none;
+        }
+
+        /* XP pulse animation */
+        .xp-pulse {
+          display: inline-block;
+          animation: xpPulse 0.8s ease-in-out;
+        }
+
+        @keyframes xpPulse {
+          0% { transform: scale(1); color: #ffc107; }
+          50% { transform: scale(1.18); color: #ffd54a; }
+          100% { transform: scale(1); color: #ffc107; }
+        }
+
+        /* Chart Styles */
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .chart-card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--blue-grotto), var(--blue-green));
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--navy-blue);
+            margin-bottom: 15px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        @media (max-width: 768px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+
+            .user-stats {
+                flex-direction: column;
+                margin-left: 0;
+                gap: 0.5rem;
+            }
+        }
+
         .breathing-circle {
             width: 80px;
             height: 80px;
@@ -551,39 +803,39 @@
                 justify-content: space-between;
             }
         }
-    /* Basic avatar styling */
-    .user-avatar {
-      background: #f4b400;
-      color: white;
-      font-weight: bold;
-      padding: 10px;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      text-align: center;
-      line-height: 40px;
-      font-size: 1rem;
-    }
-  </style>
+    </style>
 </head>
 <body>
   <div class="wave-bg"></div>
 
   <header>
     <div class="container header-content">
-      <div class="logo">
-        <div class="logo-icon"><i class="fas fa-sun"></i></div>
-        <div class="logo-text">AsDevAd</div>
+            <div class="logo">
+        <img src="https://i.ibb.co/ksr38h61/Mindful-Logo.png" alt="Mindful AI Logo" class="logo-img">
+        <span>Mindful AI</span>
       </div>
 
       <nav>
         <ul>
-          <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
-          <li><a href="articles.html"><i class="fas fa-book"></i> Resources</a></li>
+          
+          <li><a href="landingpage.html" class="nav-link" aria-label="Home"><i class="fas fa-house"></i> Home</a></li>
+          <li><a href="resources.html"><i class="fas fa-book"></i> Resources</a></li>
           <li><a href="community.html"><i class="fas fa-comments"></i> Community</a></li>
           <li><a href="#"><i class="fas fa-chart-line"></i> Progress</a></li>
+          <li><a href="#" class="active"><i class="fas fa-cog"></i> Dashboard</a></li>
         </ul>
       </nav>
+
+      <div class="user-stats">
+        <div class="stat-item">
+          <i class="fas fa-star" style="color: #ffc107;"></i>
+          <span id="user-xp">0 XP</span>
+        </div>
+        <div class="stat-item">
+          <span id="user-streak">0 🔥</span>
+        </div>
+        <div id="user-badges" style="display: flex; gap: 0.5rem;"></div>
+      </div>
 
       <div class="user-profile">
         <div class="user-avatar" id="user-avatar">U</div>
@@ -604,7 +856,7 @@
         <li><a href="report.html"><i class="fas fa-calendar-alt"></i> Report</a></li>
         <li><a href="mood.html"><i class="fas fa-chart-line"></i> Mood Tracker</a></li>
         <li><a href="diary.html"><i class="fas fa-chart-line"></i> Daily Log</a></li>
-        <li><a href="articles.html"><i class="fas fa-book"></i> Resources</a></li>
+        <li><a href="resources.html"><i class="fas fa-book"></i> Resources</a></li>
         <li><a href="chatbot.html"><i class="fas fa-comment-dots"></i> Chat Support</a></li>
         <li><a href="https://discord.gg/jQcWu6qH"><i class="fas fa-users"></i> Community</a></li>
         <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
@@ -614,9 +866,29 @@
 
     <main class="dashboard-content">
       <section class="greeting">
-        <h1>Good morning, <span id="user-first-name">User</span>!</h1>
-        <p>Welcome to your Mild Depression support dashboard. Today is a new opportunity to take small steps toward feeling better. Remember, every small action counts.</p>
+        <h1>Good morning, <span id="user-first-name">User</span>! 🌟</h1>
+        <p>Welcome to your mental wellness journey. You're here because you care about your wellbeing—and that's a powerful first step. Today, focus on what feels manageable. Complete one task, practice one moment of mindfulness, or simply be kind to yourself. Progress over perfection. You've got this! 💪</p>
       </section>
+
+      <!-- Smart Recommendations -->
+      <div id="smart-recommendations"></div>
+
+      <!-- Charts Section -->
+      <div class="charts-section">
+        <div class="chart-card">
+          <div class="chart-title">📊 Mood Trend (Last 7 Days)</div>
+          <div class="chart-container">
+            <canvas id="moodTrendChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-title">🎯 Progress Overview</div>
+          <div class="chart-container">
+            <canvas id="progressChart"></canvas>
+          </div>
+        </div>
+      </div>
 
       <div class="dashboard-grid">
         <div class="dashboard-card">
@@ -635,6 +907,17 @@
             <div class="progress-text">
               <span>Week 2</span>
               <span>35% Complete</span>
+            </div>
+          </div>
+
+          <!-- XP Progress (shows current level and progress to next level) -->
+          <div id="xp-progress" class="progress-container" style="margin-top:12px;">
+            <div class="progress-bar" aria-hidden="true">
+              <div id="xp-progress-fill" class="progress-fill" style="width: 0%;"></div>
+            </div>
+            <div class="progress-text">
+              <span id="xp-progress-text">Level 1 — 0/100 XP</span>
+              <span id="xp-progress-amt"></span>
             </div>
           </div>
 
@@ -665,48 +948,34 @@
           <a href="mood.html" class="cta-button">Log Today's Mood</a>
         </div>
 
-        <div class="dashboard-card">
+        <div class="dashboard-card todo-card">
           <div class="card-header">
             <div>
               <h3 class="card-title">Daily Tasks</h3>
-              <p class="card-subtitle">For today, May 16, 2025</p>
+              <p class="card-subtitle">For today, <span id="todayDate"></span></p>
             </div>
             <div class="card-icon"><i class="fas fa-tasks"></i></div>
           </div>
-          <input type="text" id="custom-task-name" placeholder="New task..." style="width: 100%; padding: 10px; margin-top: 15px; border-radius: 5px;">
-<input type="time" id="custom-task-time" style="width: 100%; padding: 10px; margin-top: 10px; border-radius: 5px;">
-<button onclick="addCustomTask()" class="cta-button" style="margin-top: 10px;">Add Task</button>
+          <div class="todo-controls">
+            <input type="text" id="custom-task-name" placeholder="Add a task (e.g. 'Walk for 10 minutes')" class="todo-input" aria-label="Task name">
+            <input type="time" id="custom-task-time" class="todo-time" aria-label="Task time">
+            <button id="add-task-btn" class="todo-add">Add</button>
+          </div>
 
-          <ul class="task-list" id="task-list">
-            <li class="task-item task-completed">
-              <div class="task-checkbox completed"></div>
-              <div class="task-text">Morning mindfulness exercise (5 mins)</div>
-              <div class="task-due">8:00 AM</div>
-            </li>
-            <li class="task-item">
-              <div class="task-checkbox"></div>
-              <div class="task-text">Take a 15-minute walk outside</div>
-              <div class="task-due">12:30 PM</div>
-            </li>
-            <li class="task-item">
-              <div class="task-checkbox"></div>
-              <div class="task-text">Write in gratitude journal</div>
-              <div class="task-due">7:00 PM</div>
-            </li>
-            <li class="task-item">
-              <div class="task-checkbox"></div>
-              <div class="task-text">Do one thing you enjoy today</div>
-              <div class="task-due">Anytime</div>
-            </li>
-            <li style="flex-direction: column; gap: 10px; padding-top: 20px;">
-  <input type="text" id="custom-task-name" placeholder="New task name..." style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ccc;">
-  <input type="time" id="custom-task-time" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ccc;">
-  <button onclick="addCustomTask()" class="cta-button" style="margin-top: 10px;">Add Task</button>
-</li>
+          <div class="todo-toolbar">
+            <div id="filter-all" class="todo-filter active">All</div>
+            <div id="filter-active" class="todo-filter">Active</div>
+            <div id="filter-completed" class="todo-filter">Completed</div>
+            <div style="margin-left:auto; color:#666; font-size:0.9rem;">Saved locally • <button id="clear-tasks" class="icon-btn" title="Clear all tasks" style="font-weight:600;color:#d9534f;">Clear</button></div>
+          </div>
 
+          <ul class="todo-list" id="todo-list" aria-live="polite">
+            <!-- Tasks rendered here -->
           </ul>
 
-          <a href="tasks.html" class="cta-button">View All Tasks</a>
+          <div style="display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-top:10px;">
+            <a href="tasks.html" class="cta-button">View All Tasks</a>
+          </div>
         </div>
         <div class="dashboard-card">
           <div class="card-header">
@@ -735,7 +1004,7 @@
             <div class="resource-item">
               <div class="resource-icon"><i class="fas fa-file-alt"></i></div>
               <div class="resource-info">
-                <a href="articles.html"><div class="resource-title">Understanding Mild Depression: A Beginner's Guide</div></a>
+                <a href="resources.html"><div class="resource-title">Understanding Mild Depression: A Beginner's Guide</div></a>
                 <div class="resource-type">Article • 5 min read</div>
               </div>
             </div>
@@ -762,14 +1031,14 @@
             </div>
           </div>
 
-          <a href="articles.html" class="cta-button">Browse All Resources</a>
+          <a href="resources.html" class="cta-button">Browse All Resources</a>
         </div>
       </div>
     </main>
   </div>
 
   <script>
-document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("DOMContentLoaded", function () {
   const user = JSON.parse(localStorage.getItem("currentUser"));
   if (user) {
     const fullName = user.name || 'User';
@@ -797,12 +1066,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.getElementById("depression-level").textContent = level;
   } else {
-    window.location.href = "index.html";
+    window.location.href = "landingpage.html";
+  }
+
+  // Fill dynamic date for dashboard
+  const todayEl = document.getElementById('todayDate');
+  if (todayEl) {
+    const opts = { year: 'numeric', month: 'long', day: 'numeric' };
+    todayEl.textContent = new Date().toLocaleDateString(undefined, opts);
   }
 });
 // Task functionality moved to tasks.js
 
 </script>
 <script src="tasks.js"></script>
+<!-- Demo data helper (populates localStorage for charts when backend data is missing) -->
+<script src="demo-data.js"></script>
+<script src="dashboard-enhanced.js"></script>
 </body>
 </html>

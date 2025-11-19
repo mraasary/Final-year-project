@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Settings - AsDevAd</title>
+  <title>Settings - Mindful AI</title>
   <link rel="stylesheet" href="settings.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -13,15 +14,17 @@
     <div class="container">
       <div class="navbar-container">
         <div class="logo">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="heart-icon"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>
-          <span>AsDevAd</span>
+          <img src="https://i.ibb.co/ksr38h61/Mindful-Logo.png" alt="Mindful AI Logo" class="logo-img">
+          <span>Mindful AI</span>
         </div>
         <ul class="nav-links">
-          <li><a href="landing.html" class="nav-link">Home</a></li>
+          <li><a href="landingpage.html" class="nav-link" aria-label="Home"><i class="fas fa-house"></i> Home</a></li>
           <li><a href="articles.html" class="nav-link">Articles</a></li>
+          <li><a href="resources.html" class="nav-link">Resources</a></li>
           <li><a href="about.html" class="nav-link">About</a></li>
-          <li><a href="articles.html" class="nav-link">Resources</a></li>
+          <li><a href="services.html" class="nav-link">Services</a></li>
           <li><a href="community.html" class="nav-link">Community</a></li>
+          <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
           <li><a href="settings.html" class="nav-link active">Settings</a></li>
         </ul>
         <button class="mobile-menu-btn">
@@ -121,116 +124,27 @@
           <!-- Notifications Settings Section -->
           <div id="notifications" class="settings-section">
             <h2 class="section-title">Notification Settings</h2>
-            <div class="notification-options">
-              <div class="notification-option">
-                <div>
-                  <h3>Email Notifications</h3>
-                  <p>Receive email updates about new articles and resources</p>
-                </div>
-                <label class="toggle">
-                  <input type="checkbox" checked>
-                  <span class="toggle-slider"></span>
-                </label>
-              </div>
-              <div class="notification-option">
-                <div>
-                  <h3>Newsletter</h3>
-                  <p>Receive our monthly newsletter with mental health tips</p>
-                </div>
-                <label class="toggle">
-                  <input type="checkbox" checked>
-                  <span class="toggle-slider"></span>
-                </label>
-              </div>
-              <div class="notification-option">
-                <div>
-                  <h3>Community Updates</h3>
-                  <p>Get notified about community events and discussions</p>
-                </div>
-                <label class="toggle">
-                  <input type="checkbox">
-                  <span class="toggle-slider"></span>
-                </label>
-              </div>
-            </div>
+            <p style="color: #666; margin-bottom: 20px;">Manage your notification preferences including email frequency, notification types, and delivery methods.</p>
             <div class="form-group">
-              <button type="submit" class="save-btn">Save Preferences</button>
+              <a href="notifications-settings.html" class="save-btn" style="display: inline-block; text-decoration: none; text-align: center;">🔔 Open Notification Settings</a>
             </div>
           </div>
 
           <!-- Privacy Settings Section -->
           <div id="privacy" class="settings-section">
             <h2 class="section-title">Privacy Settings</h2>
-            <div class="privacy-options">
-              <div class="privacy-option">
-                <div>
-                  <h3>Profile Visibility</h3>
-                  <p>Control who can see your profile information</p>
-                </div>
-                <select class="privacy-select">
-                  <option value="public">Public</option>
-                  <option value="members" selected>Members Only</option>
-                  <option value="private">Private</option>
-                </select>
-              </div>
-              <div class="privacy-option">
-                <div>
-                  <h3>Activity Status</h3>
-                  <p>Show when you're active on the platform</p>
-                </div>
-                <label class="toggle">
-                  <input type="checkbox" checked>
-                  <span class="toggle-slider"></span>
-                </label>
-              </div>
-              <div class="privacy-option">
-                <div>
-                  <h3>Data Usage</h3>
-                  <p>Allow us to use your data to improve your experience</p>
-                </div>
-                <label class="toggle">
-                  <input type="checkbox" checked>
-                  <span class="toggle-slider"></span>
-                </label>
-              </div>
-            </div>
+            <p style="color: #666; margin-bottom: 20px;">Manage your privacy preferences including profile visibility, activity status, and data usage.</p>
             <div class="form-group">
-              <button type="submit" class="save-btn">Save Privacy Settings</button>
+              <a href="privacy-settings.html" class="save-btn" style="display: inline-block; text-decoration: none; text-align: center;">🔒 Open Privacy Settings</a>
             </div>
           </div>
 
           <!-- Appearance Settings Section -->
           <div id="appearance" class="settings-section">
             <h2 class="section-title">Appearance Settings</h2>
-            <div class="appearance-options">
-              <div class="theme-selection">
-                <h3>Theme</h3>
-                <div class="theme-options">
-                  <div class="theme-option active">
-                    <div class="theme-preview light-theme"></div>
-                    <span>Light</span>
-                  </div>
-                  <div class="theme-option">
-                    <div class="theme-preview dark-theme"></div>
-                    <span>Dark</span>
-                  </div>
-                  <div class="theme-option">
-                    <div class="theme-preview system-theme"></div>
-                    <span>System</span>
-                  </div>
-                </div>
-              </div>
-              <div class="font-selection">
-                <h3>Font Size</h3>
-                <div class="font-options">
-                  <button class="font-option">Small</button>
-                  <button class="font-option active">Medium</button>
-                  <button class="font-option">Large</button>
-                </div>
-              </div>
-            </div>
+            <p style="color: #666; margin-bottom: 20px;">Customize the look and feel of Mindful AI with different themes, font sizes, and accessibility options.</p>
             <div class="form-group">
-              <button type="submit" class="save-btn">Save Appearance</button>
+              <a href="appearance-settings.html" class="save-btn" style="display: inline-block; text-decoration: none; text-align: center;">🎨 Open Appearance Settings</a>
             </div>
           </div>
         </div>
@@ -243,12 +157,13 @@
       <div class="footer-content">
         <div class="footer-logo">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="heart-icon"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>
-          <span>AsDevAd</span>
+          <span>Mindful AI</span>
         </div>
         <p class="footer-tagline">Supporting mental health awareness and recovery</p>
       </div>
       <div class="footer-copyright">
-        <p>&copy; <span id="current-year"></span> AsDevAd. All rights reserved.</p>
+    <div class="footer-links"><a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="contact.html">Contact</a></div>
+    <p>&copy; <span id="current-year"></span> Mindful AI. All rights reserved.</p>
       </div>
     </div>
   </footer>

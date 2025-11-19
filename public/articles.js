@@ -1,312 +1,363 @@
-// Articles functionality
+// Articles Implementation - displays mental health articles from a local dataset with external links
+// Features: search, category filter, sort, modal details, bookmarks
 
-// DOM Elements
-let featuredArticleContainer;
-let categoryFiltersContainer;
-let articlesGrid;
-let loadMoreBtn;
-let noArticlesMessage;
-let articleModal;
-let closeModalBtn;
+const STORAGE_KEY = 'mindfulai_bookmarks_v1';
 
-// Articles data
-let articles = [];
-let featuredArticle = null;
-let filteredArticles = [];
-let selectedCategory = "All";
-let visibleCount = 6;
+// Complete articles dataset with internal content and external resource links
+const articlesData = [
+  {
+    id: 1,
+    title: "Mindfulness for Beginners: A Practical Guide",
+    source: 'Mindful.org',
+    category: 'Mindfulness',
+    excerpt: 'Simple, evidence-based practices to get started with mindfulness, including breath work and short daily routines you can do anywhere.',
+    url: 'https://www.mindful.org/how-to-meditate/',
+    image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&h=400&fit=crop',
+    date: '2023-09-12'
+  },
+  {
+    id: 2,
+    title: 'Mental Health Support in India: Resources & Helplines',
+    source: 'NIMHANS & NGOs',
+    category: 'India Resources',
+    excerpt: 'A curated list of hotlines, government programs, and NGO services offering mental health support across Indian states and major cities.',
+    url: 'https://nimhans.ac.in',
+    image: 'https://images.unsplash.com/photo-1516627145497-ae6ab60908c9?w=800&h=400&fit=crop',
+    date: '2024-01-05'
+  },
+  {
+    id: 3,
+    title: 'CBT Techniques: Short Exercises for Anxiety',
+    source: 'Psychology Today',
+    category: 'Anxiety',
+    excerpt: 'Practical Cognitive Behavioural Therapy (CBT) exercises to challenge anxious thoughts and build mental resilience.',
+    url: 'https://www.psychologytoday.com/us/basics/cognitive-behavioral-therapy',
+    image: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&h=400&fit=crop',
+    date: '2022-11-20'
+  },
+  {
+    id: 4,
+    title: 'Meditation Apps: Best Picks for 2024',
+    source: 'Tech Wellness',
+    category: 'Tools',
+    excerpt: 'Comparison of popular meditation apps, their strengths and pricing to help you pick the right one for consistent practice.',
+    url: 'https://www.insight-timer.com',
+    image: 'https://images.unsplash.com/photo-1453614512568-c4024d13c247?w=800&h=400&fit=crop',
+    date: '2024-03-02'
+  },
+  {
+    id: 5,
+    title: 'Nutrition and Mental Health: Foods That Help',
+    source: 'Nutrition Today',
+    category: 'Wellness',
+    excerpt: 'An overview of nutrients, diet patterns, and simple recipes that support mood and cognitive function.',
+    url: 'https://www.health.harvard.edu/mind-and-mood',
+    image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=400&fit=crop',
+    date: '2023-06-18'
+  },
+  {
+    id: 6,
+    title: 'Mental Health: Strengthening Our Response',
+    source: 'World Health Organization',
+    category: 'Global Health',
+    excerpt: 'WHO overview on global mental health priorities, strategies for integration of mental health into health systems, and resources for support.',
+    url: 'https://www.who.int/health-topics/mental-health',
+    image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&h=400&fit=crop',
+    date: '2021-10-10'
+  },
+  {
+    id: 7,
+    title: 'Mental Health Information and Research',
+    source: 'National Institute of Mental Health (NIMH)',
+    category: 'Research',
+    excerpt: 'Authoritative information about mental disorders, treatments, and cutting-edge research from the U.S. National Institute of Mental Health.',
+    url: 'https://www.nimh.nih.gov/health/topics',
+    image: 'https://images.unsplash.com/photo-1576091160535-112f2b40c7b2?w=800&h=400&fit=crop',
+    date: '2023-08-01'
+  },
+  {
+    id: 8,
+    title: 'Mental Health Services and Support',
+    source: 'NHS (UK)',
+    category: 'Wellbeing',
+    excerpt: 'Practical advice and guides on managing common mental health problems, improving wellbeing, and finding local support in the UK.',
+    url: 'https://www.nhs.uk/mental-health/',
+    image: 'https://images.unsplash.com/photo-1489749798305-ed7881ed4c5c?w=800&h=400&fit=crop',
+    date: '2024-02-14'
+  },
+  {
+    id: 9,
+    title: 'Mental Health: Overview and Tips',
+    source: 'Mayo Clinic',
+    category: 'Health',
+    excerpt: 'Trusted, clinician-reviewed articles on mental health conditions, symptoms, and treatments with practical tips for self-care.',
+    url: 'https://www.mayoclinic.org/healthy-lifestyle/adult-health/in-depth/mental-health/art-20046477',
+    image: 'https://images.unsplash.com/photo-1516627145497-ae6ab60908c9?w=800&h=400&fit=crop',
+    date: '2022-05-20'
+  },
+  {
+    id: 10,
+    title: 'How to Look After Your Mental Health',
+    source: 'Mental Health Foundation',
+    category: 'Wellbeing',
+    excerpt: 'Guides and evidence-based tips on looking after your mental health, from everyday wellbeing to understanding mental illnesses.',
+    url: 'https://www.mentalhealth.org.uk/publications/how-to-mental-health',
+    image: 'https://images.unsplash.com/photo-1528716321318-c852f09be34b?w=800&h=400&fit=crop',
+    date: '2023-11-11'
+  }
+];
 
-// Initialize articles page
-function initArticles() {
-  // Get DOM elements
-  featuredArticleContainer = document.getElementById('featured-article');
-  categoryFiltersContainer = document.getElementById('category-filters');
-  articlesGrid = document.getElementById('articles-grid');
-  loadMoreBtn = document.getElementById('load-more-btn');
-  noArticlesMessage = document.getElementById('no-articles');
-  articleModal = document.getElementById('article-modal');
-  closeModalBtn = document.getElementById('close-modal');
-  
-  // Load articles data
-  loadArticlesData();
-  
-  // Add event listeners
-  addEventListeners();
+// Utility functions
+function qs(sel, root = document) {
+  return root.querySelector(sel);
 }
 
-// Load articles data from API
-async function loadArticlesData() {
+function qsa(sel, root = document) {
+  return Array.from(root.querySelectorAll(sel));
+}
+
+function escapeHtml(str) {
+  if (typeof str !== 'string') return str;
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  };
+  return str.replace(/[&<>"']/g, m => map[m]);
+}
+
+function loadBookmarks() {
   try {
-    const response = await fetch('/api/articles');
-    articles = await response.json();
-    
-    // Set featured article (first article or random)
-    featuredArticle = articles[0];
-    
-    // Get unique categories
-    const categories = ["All", ...new Set(articles.map(article => article.category))];
-    
-    // Initialize filtered articles
-    filteredArticles = articles.filter(article => article.id !== featuredArticle.id);
-    
-    // Render UI
-    loadFeaturedArticle();
-    loadCategories(categories);
-    displayArticles();
-  } catch (error) {
-    console.error('Error loading articles:', error);
-    articlesGrid.innerHTML = '<div class="error-message">Failed to load articles. Please try again later.</div>';
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  } catch (e) {
+    return [];
   }
 }
 
-// Load category filters
-function loadCategories(categories) {
-  categoryFiltersContainer.innerHTML = '';
-  
-  categories.forEach(category => {
-    const categoryBtn = document.createElement('button');
-    categoryBtn.className = 'category-pill';
-    categoryBtn.textContent = category;
-    
-    if (category === selectedCategory) {
-      categoryBtn.classList.add('active');
-    }
-    
-    categoryBtn.addEventListener('click', () => {
-      // Update active class
-      document.querySelectorAll('.category-pill').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      categoryBtn.classList.add('active');
-      
-      // Update selected category
-      selectedCategory = category;
-      
-      // Reset visible count
-      visibleCount = 6;
-      
-      // Filter articles
-      filterArticles();
-    });
-    
-    categoryFiltersContainer.appendChild(categoryBtn);
-  });
+function saveBookmarks(list) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
 }
 
-// Load featured article
-function loadFeaturedArticle() {
-  if (featuredArticle) {
-    const featuredHtml = `
-      <div class="featured-img-container">
-        <img src="${featuredArticle.image}" alt="${featuredArticle.title}" class="featured-img">
-      </div>
-      <div class="featured-content">
-        <span class="featured-category">${featuredArticle.category}</span>
-        <h3 class="featured-title">${featuredArticle.title}</h3>
-        <p class="featured-excerpt">${featuredArticle.excerpt}</p>
-        <div class="featured-meta">
-          <div class="read-time">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>
-            <span>${featuredArticle.readTime} read</span>
-          </div>
-          <a href="#" class="read-more" data-id="${featuredArticle.id}">Read more →</a>
-        </div>
-      </div>
-    `;
-    
-    featuredArticleContainer.innerHTML = featuredHtml;
-    
-    // Add event listener to the "Read more" link
-    featuredArticleContainer.querySelector('.read-more').addEventListener('click', (event) => {
-      event.preventDefault();
-      const articleId = event.target.getAttribute('data-id');
-      openArticleDetail(articleId);
+function isBookmarked(id) {
+  return loadBookmarks().includes(id);
+}
+
+function toggleBookmark(id) {
+  const list = loadBookmarks();
+  const idx = list.indexOf(id);
+  if (idx === -1) {
+    list.push(id);
+  } else {
+    list.splice(idx, 1);
+  }
+  saveBookmarks(list);
+}
+
+function truncate(text, n = 140) {
+  if (!text) return '';
+  return text.length > n ? text.slice(0, n - 1) + '…' : text;
+}
+
+// Get filtered and sorted articles
+function getFilteredList() {
+  const searchInput = qs('#searchInput');
+  const categoryFilter = qs('#categoryFilter');
+  const sortSelect = qs('#sortSelect');
+
+  const q = (searchInput ? searchInput.value : '').trim().toLowerCase();
+  const cat = categoryFilter ? categoryFilter.value : 'all';
+  const sort = sortSelect ? sortSelect.value : 'newest';
+
+  let list = articlesData.slice();
+
+  // Filter by category
+  if (cat !== 'all') {
+    list = list.filter(a => a.category === cat);
+  }
+
+  // Filter by search
+  if (q) {
+    list = list.filter(a => {
+      const haystack = (a.title + ' ' + a.excerpt + ' ' + a.category).toLowerCase();
+      return haystack.includes(q);
     });
   }
+
+  // Sort
+  if (sort === 'newest') {
+    list.sort((a, b) => new Date(b.date) - new Date(a.date));
+  } else if (sort === 'oldest') {
+    list.sort((a, b) => new Date(a.date) - new Date(b.date));
+  } else if (sort === 'title') {
+    list.sort((a, b) => a.title.localeCompare(b.title));
+  }
+
+  return list;
 }
 
-// Filter articles based on selected category
-function filterArticles() {
-  // Filter articles
-  filteredArticles = articles.filter(article => {
-    if (featuredArticle && article.id === featuredArticle.id) {
-      return false; // Exclude featured article
-    }
-    
-    return selectedCategory === "All" || article.category === selectedCategory;
-  });
-  
-  // Display articles
-  displayArticles();
-}
+// Render articles to grid
+function renderArticles(list) {
+  const grid = qs('#articlesGrid');
+  const noArticles = qs('#noArticles');
 
-// Display articles in the grid
-function displayArticles() {
-  // Clear grid
-  articlesGrid.innerHTML = '';
-  
-  // Check if there are any articles to display
-  if (filteredArticles.length === 0) {
-    noArticlesMessage.style.display = 'block';
-    loadMoreBtn.style.display = 'none';
+  if (!grid) return;
+
+  grid.innerHTML = '';
+
+  if (list.length === 0) {
+    if (noArticles) noArticles.style.display = 'block';
     return;
   }
-  
-  // Hide no articles message
-  noArticlesMessage.style.display = 'none';
-  
-  // Display articles up to visible count
-  const articlesToShow = filteredArticles.slice(0, visibleCount);
-  
-  articlesToShow.forEach(article => {
-    const articleCard = document.createElement('div');
-    articleCard.className = 'article-card';
-    
-    articleCard.innerHTML = `
-      <div class="article-img-container">
-        <img src="${article.image}" alt="${article.title}" class="article-img">
-      </div>
+
+  if (noArticles) noArticles.style.display = 'none';
+
+  list.forEach(article => {
+    const card = document.createElement('div');
+    card.className = 'article-card';
+    card.setAttribute('data-id', article.id);
+
+    card.innerHTML = `
+      <img src="${escapeHtml(article.image)}" alt="${escapeHtml(article.title)}" class="article-image">
       <div class="article-content">
-        <span class="article-category">${article.category}</span>
-        <h3 class="article-title">${article.title}</h3>
-        <p class="article-excerpt">${article.excerpt}</p>
+        <span class="article-category">${escapeHtml(article.category)}</span>
+        <h3 class="article-title">${escapeHtml(article.title)}</h3>
+        <p class="article-excerpt">${escapeHtml(truncate(article.excerpt, 160))}</p>
         <div class="article-meta">
-          <div class="read-time">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>
-            <span>${article.readTime} read</span>
-          </div>
-          <a href="#" class="read-more" data-id="${article.id}">Read more →</a>
+          <span>${escapeHtml(article.source)}</span>
+          <button class="read-btn" data-id="${article.id}">Read More</button>
         </div>
       </div>
     `;
-    
-    articlesGrid.appendChild(articleCard);
-    
-    // Add event listener to the "Read more" link
-    articleCard.querySelector('.read-more').addEventListener('click', (event) => {
-      event.preventDefault();
-      const articleId = event.target.getAttribute('data-id');
-      openArticleDetail(articleId);
+
+    grid.appendChild(card);
+  });
+
+  // Attach event listeners
+  qsa('.read-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.preventDefault();
+      const id = parseInt(e.currentTarget.dataset.id);
+      const article = articlesData.find(a => a.id === id);
+      if (article) showModal(article);
     });
   });
-  
-  // Show/hide load more button
-  if (articlesToShow.length < filteredArticles.length) {
-    loadMoreBtn.style.display = 'block';
-  } else {
-    loadMoreBtn.style.display = 'none';
-  }
 }
 
-// Open article detail modal
-function openArticleDetail(articleId) {
-  const article = articles.find(a => a.id === articleId);
-  
-  if (article) {
-    const modalContent = document.getElementById('article-modal-content');
-    
-    modalContent.innerHTML = `
-      <div class="article-detail-header">
-        <span class="article-category">${article.category}</span>
-        <h2 class="article-title">${article.title}</h2>
-        <div class="article-meta">
-          <div class="read-time">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>
-            <span>${article.readTime} read</span>
-          </div>
-        </div>
-      </div>
-      <div class="article-detail-img-container">
-        <img src="${article.image}" alt="${article.title}" class="article-detail-img">
-      </div>
-      <div class="article-detail-content">
-        ${formatContent(article.content)}
-      </div>
-      <div class="article-detail-footer">
-        <a href="#" id="close-detail" class="back-to-articles">← Back to Articles</a>
-      </div>
-    `;
-    
-    // Show modal
-    articleModal.style.display = 'block';
-    document.body.style.overflow = 'hidden'; // Prevent scrolling
-    
-    // Add event listener to the "Back to Articles" button
-    document.getElementById('close-detail').addEventListener('click', (event) => {
-      event.preventDefault();
-      closeArticleDetail();
-    });
-  }
+// Populate category filter dropdown
+function renderCategories() {
+  const select = qs('#categoryFilter');
+  if (!select) return;
+
+  const cats = Array.from(new Set(articlesData.map(a => a.category))).sort();
+  select.innerHTML = '<option value="all">All Categories</option>' + cats.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
 }
 
-// Format article content with paragraphs
-function formatContent(content) {
-  if (!content) return '';
-  return content.split('\n\n').map(paragraph => `<p>${paragraph}</p>`).join('');
+// Show modal with article details
+function showModal(article) {
+  const modal = qs('#articleModal');
+  if (!modal) return;
+
+  const title = qs('#modalTitle');
+  const image = qs('#modalImage');
+  const source = qs('#modalSource');
+  const summary = qs('#modalSummary');
+  const readBtn = qs('#modalRead');
+
+  if (title) title.textContent = article.title;
+  if (image) {
+    image.src = article.image;
+    image.alt = article.title;
+  }
+  if (source) source.textContent = `${article.source} • ${article.date}`;
+  if (summary) summary.textContent = article.excerpt + '\n\nSource: ' + article.source + '\n\nFor full article, click "Open Source" button above.';
+
+  if (readBtn) {
+    readBtn.textContent = 'Open Source';
+    readBtn.onclick = () => window.open(article.url, '_blank');
+  }
+
+  modal.classList.add('active');
+  modal.setAttribute('aria-hidden', 'false');
 }
 
-// Close article detail modal
-function closeArticleDetail() {
-  articleModal.style.display = 'none';
-  document.body.style.overflow = ''; // Restore scrolling
+// Close modal
+function closeModal() {
+  const modal = qs('#articleModal');
+  if (!modal) return;
+  modal.classList.remove('active');
+  modal.setAttribute('aria-hidden', 'true');
 }
 
-// Add global event listeners
-function addEventListeners() {
-  // Load more articles
-  if (loadMoreBtn) {
-    loadMoreBtn.addEventListener('click', () => {
-      visibleCount += 3;
-      displayArticles();
-    });
-  }
-  
-  // Close modal when clicking the X
-  if (closeModalBtn) {
-    closeModalBtn.addEventListener('click', closeArticleDetail);
-  }
-  
-  // Close modal when clicking outside of content
-  if (articleModal) {
-    window.addEventListener('click', (event) => {
-      if (event.target === articleModal) {
-        closeArticleDetail();
-      }
-    });
-  }
-  
-  // Close modal with Escape key
-  if (articleModal) {
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && articleModal.style.display === 'block') {
-        closeArticleDetail();
-      }
-    });
-  }
-  
-  // Mobile menu toggle
-  const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-  const navLinks = document.querySelector('.nav-links');
-  
-  if (mobileMenuBtn && navLinks) {
-    mobileMenuBtn.addEventListener('click', () => {
-      navLinks.classList.toggle('active');
-    });
-  }
-  
-  // Newsletter form submission
-  const newsletterForm = document.querySelector('.newsletter-form');
-  if (newsletterForm) {
-    newsletterForm.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const emailInput = newsletterForm.querySelector('input[type="email"]');
-      if (emailInput) {
-        alert(`Thank you for subscribing with ${emailInput.value}! You'll receive our next newsletter soon.`);
-        emailInput.value = '';
-      }
-    });
-  }
+// Apply current filters and re-render
+function renderCurrent() {
+  const list = getFilteredList();
+  renderArticles(list);
 }
 
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', initArticles);
+// Initialize on DOM load
+document.addEventListener('DOMContentLoaded', () => {
+  // Set year
+  const yearSpan = qs('#year');
+  if (yearSpan) yearSpan.textContent = new Date().getFullYear();
+
+  // Setup event listeners
+  const searchInput = qs('#searchInput');
+  const categoryFilter = qs('#categoryFilter');
+  const sortSelect = qs('#sortSelect');
+  const clearFilters = qs('#clearFilters');
+  const modalClose = qs('#modalClose');
+  const modal = qs('#articleModal');
+
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      renderCurrent();
+    });
+  }
+
+  if (categoryFilter) {
+    categoryFilter.addEventListener('change', renderCurrent);
+  }
+
+  if (sortSelect) {
+    sortSelect.addEventListener('change', renderCurrent);
+  }
+
+  if (clearFilters) {
+    clearFilters.addEventListener('click', () => {
+      if (searchInput) searchInput.value = '';
+      if (categoryFilter) categoryFilter.value = 'all';
+      if (sortSelect) sortSelect.value = 'newest';
+      renderCurrent();
+    });
+  }
+
+  if (modalClose) {
+    modalClose.addEventListener('click', closeModal);
+  }
+
+  if (modal) {
+    modal.addEventListener('click', e => {
+      if (e.target === modal) closeModal();
+    });
+  }
+
+  // Close on Escape
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
+      closeModal();
+    }
+  });
+
+  // Initial render
+  renderCategories();
+  renderCurrent();
+});
+
+// Expose for debugging
+window.MindfulArticles = {
+  data: articlesData,
+  bookmarks: loadBookmarks,
+  toggleBookmark
+};
