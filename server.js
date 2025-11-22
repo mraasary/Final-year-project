@@ -8,7 +8,10 @@ require('dotenv').config();
 const bcrypt = require('bcryptjs');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "https://final-year-project-0zb3.onrender.com/",
+  credentials: true
+}));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
